@@ -43,20 +43,7 @@ def get_sentiment_score(comment):
     compound_score = sentiment_scores['compound']  
     return round(1 + (compound_score + 1) * 2, 2) 
 
-def updateDealSentiment(bankID, cityID, dealID, userID, comment):
-    """
-    Update deal sentiment in Firebase with the new comment
-    
-    Args:
-        bankID (str): ID of the bank
-        cityID (str): ID of the city
-        dealID (str): ID of the deal
-        userID (str): ID of the user
-        comment (str): User's comment
-    
-    Returns:
-        dict: Status of the update operation
-    """
+def updateDealSentiment(bankID, cityID, dealID, userID, userName, comment):
     if not firebase_initialized:
         return {
             'status': 'error',
@@ -64,39 +51,29 @@ def updateDealSentiment(bankID, cityID, dealID, userID, comment):
         }
     
     try:
-        # Calculate sentiment score for the comment
         sentiment_score = get_sentiment_score(comment)
-        
-        # Get current date in format "April 03, 2025"
         current_date = datetime.datetime.now().strftime("%B %d, %Y")
-        
-        # Reference to the deal document
         deal_ref = db.collection('Banks').document(bankID).collection('Cities').document(cityID).collection('Deals').document(dealID)
-        
-        # Get the current deal data
         deal_doc = deal_ref.get()
         
         if deal_doc.exists:
             deal_data = deal_doc.to_dict()
             
-            # Initialize comments array if it doesn't exist
             if 'comments' not in deal_data:
                 deal_data['comments'] = []
             
-            # Add new comment with sentiment score and date
             new_comment = {
                 'userID': userID,
+                'userName': userName,
                 'comment': comment,
                 'sentimentScore': sentiment_score,
-                'date': current_date  # Add the date field
+                'date': current_date
             }
             deal_data['comments'].append(new_comment)
             
-            # Calculate average sentiment
             total_score = sum(comment_item['sentimentScore'] for comment_item in deal_data['comments'])
             avg_sentiment = total_score / len(deal_data['comments'])
             
-            # Update the document
             deal_ref.update({
                 'comments': deal_data['comments'],
                 'avgSentiment': round(avg_sentiment, 2)
@@ -107,7 +84,7 @@ def updateDealSentiment(bankID, cityID, dealID, userID, comment):
                 'message': 'Deal sentiment updated successfully',
                 'newSentimentScore': sentiment_score,
                 'newAvgSentiment': round(avg_sentiment, 2),
-                'date': current_date  # Include date in the response
+                'date': current_date
             }
         else:
             return {
@@ -134,8 +111,15 @@ def analyze():
 
         sentiment_score = get_sentiment_score(comment)
         
-        if all(key in data for key in ["bankID", "cityID", "dealID", "userID"]):
-            update_result = updateDealSentiment(data["bankID"], data["cityID"], data["dealID"], data["userID"], comment)
+        if all(key in data for key in ["bankID", "cityID", "dealID", "userID", "userName"]):
+            update_result = updateDealSentiment(
+                data["bankID"], 
+                data["cityID"], 
+                data["dealID"], 
+                data["userID"], 
+                data["userName"],
+                comment
+            )
             return jsonify({"sentiment_score": sentiment_score, "update_result": update_result})
         
         return jsonify({"sentiment_score": sentiment_score})
