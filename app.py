@@ -67,7 +67,7 @@ def updateDealSentiment(bankID, cityID, dealID, userID, userName, comment):
                 'userName': userName,
                 'comment': comment,
                 'sentimentScore': sentiment_score,
-                'date': current_date
+                'date': firestore.SERVER_TIMESTAMP
             }
             deal_data['comments'].append(new_comment)
             
