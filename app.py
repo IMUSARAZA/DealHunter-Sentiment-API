@@ -5,7 +5,8 @@ import logging
 import firebase_admin
 from firebase_admin import credentials, firestore
 import nltk 
-from nltk.sentiment.vader import SentimentIntensityAnalyzer 
+from nltk.sentiment.vader import SentimentIntensityAnalyzer
+import datetime
 
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 warnings.filterwarnings('ignore')
