@@ -52,7 +52,7 @@ def updateDealSentiment(bankID, cityID, dealID, userID, userName, comment):
     
     try:
         sentiment_score = get_sentiment_score(comment)
-        current_date = datetime.datetime.now().strftime("%B %d, %Y")
+        current_date = datetime.datetime.now().strftime("%B %d, %Y %H:%M:%S")
         deal_ref = db.collection('Banks').document(bankID).collection('Cities').document(cityID).collection('Deals').document(dealID)
         deal_doc = deal_ref.get()
         
