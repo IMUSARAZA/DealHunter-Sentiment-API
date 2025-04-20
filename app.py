@@ -7,12 +7,15 @@ from firebase_admin import credentials, firestore
 import nltk 
 from nltk.sentiment.vader import SentimentIntensityAnalyzer
 import datetime
+from flask_cors import CORS 
+
 
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 warnings.filterwarnings('ignore')
 logging.getLogger('tensorflow').setLevel(logging.ERROR)
 
 app = Flask(__name__)
+CORS(app) 
 
 try:
     if os.environ.get('FIREBASE_CREDENTIALS'):
